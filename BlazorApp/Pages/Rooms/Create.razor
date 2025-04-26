@@ -1,0 +1,100 @@
+﻿@page "/Rooms/Create"
+@using Clients.Models
+
+<div class="row">
+    <div class="col-lg-8">
+        <h1 class="mb-5">New Room</h1>
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Tenant Name</label>
+            <div class="col-md-8">
+                <input class="form-control" @bind="ClientData.TenantName" />
+                <span class="text-danger">@Errors["TenantName"]?[0]</span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Phone Number</label>
+            <div class="col-md-8">
+                <input class="form-control" @bind="ClientData.PhoneNumber" />
+                <span class="text-danger">@Errors["PhoneNumber"]?[0]</span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Start Date</label>
+            <div class="col-md-8">
+                <InputDate class="form-control" @bind-Value="ClientData.StartDate" />
+                <span class="text-danger">@Errors["StartDate"]?[0]</span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label class="col-md-4 col-form-label">Payment Method</label>
+            <div class="col-md-8">
+                <select class="form-select" @bind="ClientData.PaymentMethodId">
+                    <option value="0">-- Select --</option>
+                    @foreach (var pm in PaymentMethods)
+                    {
+                        <option value="@pm.Id">@pm.MethodName</option>
+                    }
+                </select>
+                <span class="text-danger">@Errors["PaymentMethodId"]?[0]</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="offset-md-4 col-md-4 d-grid">
+                <button class="btn btn-primary" @onclick="SaveClient">Submit</button>
+            </div>
+            <div class="col-md-4 d-grid">
+                <a class="btn btn-outline-primary" href="/Clients">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@inject HttpClient Http
+@inject NavigationManager navManager
+
+@using System.Text.Json.Nodes
+
+@code {
+    // dùng RoomDto trùng với backend
+    public RoomDto ClientData { get; set; } = new();
+
+    // lưu lỗi validation từ API về
+    public JsonObject Errors { get; set; } = new JsonObject();
+
+    // danh sách payment methods để bind select
+    private List<PaymentMethod> PaymentMethods { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        PaymentMethods = await Http.GetFromJsonAsync<List<PaymentMethod>>("https://localhost:4000/api/paymentmethods")
+                         ?? new List<PaymentMethod>();
+    }
+
+    protected async Task SaveClient()
+    {
+        var response = await Http.PostAsJsonAsync("https://localhost:4000/api/rooms", ClientData);
+
+        if (response.IsSuccessStatusCode)
+        {
+            navManager.NavigateTo("/Rooms");
+        }
+        else
+        {
+            var str = await response.Content.ReadAsStringAsync();
+            try
+            {
+                var json = JsonNode.Parse(str);
+                Errors = json?["errors"]?.AsObject() ?? new JsonObject();
+            }
+            catch
+            {
+                Errors = new JsonObject();
+            }
+        }
+    }
+}

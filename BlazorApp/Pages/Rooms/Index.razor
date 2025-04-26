@@ -1,0 +1,50 @@
+﻿@page "/Rooms"
+@using Clients.Models
+
+<h1 class="text-center mb-3">List of Clients</h1>
+
+<a class="btn btn-primary mb-3" href="/Clients/Create">New Client</a>
+
+@if (Clients == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tenant Name</th>
+                <th>Phone Number</th>
+                <th>Start Date</th>
+                <th>Payment Method</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in Clients)
+            {
+                <tr>
+                    <td>@client.RoomId</td>
+                    <td>@client.TenantName</td>
+                    <td>@client.PhoneNumber</td>
+                    <td>@client.StartDate.ToShortDateString()</td>
+                    <td>@client.PaymentMethod?.MethodName</td>
+                    <td style="white-space: nowrap;">
+                        <a class="btn btn-primary btn-sm" href="/Clients/Edit/@client.RoomId">Edit</a>
+                        <a class="btn btn-danger btn-sm" href="/Clients/Delete/@client.RoomId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@inject HttpClient Http
+@code {
+    private List<Room>? Clients;
+
+    protected override async Task OnInitializedAsync() =>
+        Clients = await Http.GetFromJsonAsync<List<Room>>("https://localhost:4000/api/rooms");
+}

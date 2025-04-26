@@ -1,0 +1,122 @@
+﻿@page "/Rooms/Edit/{Id:int}"
+@using Clients.Models
+@using System.Text.Json.Nodes
+
+<div class="row">
+    <div class="col-lg-8">
+        <h1 class="mb-5">Edit Room</h1>
+
+        @if (ClientData == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <EditForm Model="ClientData" OnValidSubmit="SaveClient">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="row mb-3">
+                    <label class="col-md-4 col-form-label">Tenant Name</label>
+                    <div class="col-md-8">
+                        <InputText class="form-control" @bind-Value="ClientData.TenantName" />
+                        <span class="text-danger">@Errors["TenantName"]?[0]</span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label class="col-md-4 col-form-label">Phone Number</label>
+                    <div class="col-md-8">
+                        <InputText class="form-control" @bind-Value="ClientData.PhoneNumber" />
+                        <span class="text-danger">@Errors["PhoneNumber"]?[0]</span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label class="col-md-4 col-form-label">Start Date</label>
+                    <div class="col-md-8">
+                        <InputDate class="form-control" @bind-Value="ClientData.StartDate" />
+                        <span class="text-danger">@Errors["StartDate"]?[0]</span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label class="col-md-4 col-form-label">Payment Method</label>
+                    <div class="col-md-8">
+                        <select class="form-select" @bind="ClientData.PaymentMethodId">
+                            <option value="0">-- Select --</option>
+                            @foreach (var pm in PaymentMethods)
+                            {
+                                <option value="@pm.Id">@pm.MethodName</option>
+                            }
+                        </select>
+                        <span class="text-danger">@Errors["PaymentMethodId"]?[0]</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="offset-md-4 col-md-4 d-grid">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                    <div class="col-md-4 d-grid">
+                        <a class="btn btn-outline-secondary" href="/Clients">Cancel</a>
+                    </div>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@inject HttpClient Http
+@inject NavigationManager navManager
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private RoomDto ClientData { get; set; } = new RoomDto();
+    private List<PaymentMethod> PaymentMethods { get; set; } = new();
+    private JsonObject Errors { get; set; } = new JsonObject();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load payment methods for dropdown
+        PaymentMethods = await Http.GetFromJsonAsync<List<PaymentMethod>>("https://localhost:4000/api/paymentmethods")
+                         ?? new List<PaymentMethod>();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Load existing room data
+        var room = await Http.GetFromJsonAsync<Room>($"https://localhost:4000/api/rooms/{Id}");
+        if (room != null)
+        {
+            ClientData.TenantName = room.TenantName;
+            ClientData.PhoneNumber = room.PhoneNumber;
+            ClientData.StartDate = room.StartDate;
+            ClientData.PaymentMethodId = room.PaymentMethodId ?? 0;
+        }
+    }
+
+    private async Task SaveClient()
+    {
+        var response = await Http.PutAsJsonAsync($"https://localhost:4000/api/rooms/{Id}", ClientData);
+        if (response.IsSuccessStatusCode)
+        {
+            navManager.NavigateTo("/Clients");
+        }
+        else
+        {
+            var str = await response.Content.ReadAsStringAsync();
+            try
+            {
+                var json = JsonNode.Parse(str);
+                Errors = json?["errors"]?.AsObject() ?? new JsonObject();
+            }
+            catch
+            {
+                Errors = new JsonObject();
+            }
+        }
+    }
+}

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRUD_API", "CRUD_API\CRUD_API.csproj", "{2831C545-F706-49A1-9EDB-3A784F506C53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp", "BlazorApp\BlazorApp.csproj", "{EE18A1A0-EE84-42C3-8530-FADDE9C9556E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2831C545-F706-49A1-9EDB-3A784F506C53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2831C545-F706-49A1-9EDB-3A784F506C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2831C545-F706-49A1-9EDB-3A784F506C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2831C545-F706-49A1-9EDB-3A784F506C53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE18A1A0-EE84-42C3-8530-FADDE9C9556E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE18A1A0-EE84-42C3-8530-FADDE9C9556E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE18A1A0-EE84-42C3-8530-FADDE9C9556E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE18A1A0-EE84-42C3-8530-FADDE9C9556E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54536E3E-8014-4491-A7E6-B8890C9BF956}
+	EndGlobalSection
+EndGlobal
